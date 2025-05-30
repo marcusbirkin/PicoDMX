@@ -130,3 +130,18 @@ The SN75LBC184 could be replaced with a 3v3 line driver (e.g. MAX3483CPA) or an 
 ╚════╝   ▼     GND
         GND
 ```
+
+##### Complete Design
+
+A completed, boxed, design can be found in the hardware subdirectory.
+Power is provided by USB, signal input via BNC, and DMX output via XLR5.
+
+![Assembly](<./hardware/PicoDMX Line Driver - Assembly.png>)
+
+The follow files are available:
+* [PCB Design (EasyEDA)](<./hardware/PicoDMX Line Driver.eprj>)
+* [Enclosure Design (FreeCad)](<./hardware/PicoDMX Line Driver.FCStd>)
+* [Schematic (PDF)](<./hardware/PicoDMX Line Driver - Schematic.pdf>)
+* [Gerber (ZIP)](<./hardware/PicoDMX Line Driver - Gerber.zip>)
+* [Pick and place (XLSX)](<./hardware/PicoDMX Line Driver - PickAndPlace.xlsx>)
+* [Bill of materials (XLSX)](<./hardware/PicoDMX Line Driver - BOM.xlsx>)
