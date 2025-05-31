@@ -33,6 +33,15 @@ struct SettingsKey
 
 //-----------------------------------------------------------------------------
 
+class ScopedWaitCursor
+{
+public:
+    ScopedWaitCursor() { QApplication::setOverrideCursor(Qt::WaitCursor); }
+    ~ScopedWaitCursor() { QApplication::restoreOverrideCursor(); }
+};
+
+//-----------------------------------------------------------------------------
+
 QSettings getSettings()
 {
     return QSettings{QApplication::organizationName(), QApplication::applicationName()};
@@ -246,7 +255,7 @@ void MainWindow::refreshFrameSetupWidgets()
 
 void MainWindow::populateDeviceList()
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    const auto waitCursor = ScopedWaitCursor();
     ui->pbRefresh->setEnabled(false);
     ui->deviceList->clear();
     QApplication::processEvents();
@@ -261,7 +270,6 @@ void MainWindow::populateDeviceList()
 
     ui->statusbar->showMessage(QString("Found %1 device%2").arg(devices.size()).arg(devices.size() > 1 ? "s" : ""));
     refreshConnectionWidgets();
-    QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------
@@ -336,16 +344,14 @@ void MainWindow::connectDevice()
                 refreshConnectionWidgets();
             });
 
-        QApplication::setOverrideCursor(Qt::WaitCursor);
+        const auto waitCursor = ScopedWaitCursor();
         ui->statusbar->showMessage(QString("Connecting to %1").arg(device->serial));
         QApplication::processEvents();
         if (!picoscope->open())
         {
             ui->statusbar->showMessage(QString("Connection failed"));
         }
-        QApplication::restoreOverrideCursor();
     }
-
 }
 
 //-----------------------------------------------------------------------------
