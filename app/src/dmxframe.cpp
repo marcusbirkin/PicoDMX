@@ -1,6 +1,7 @@
 #include "dmxframe.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <utility>
 
 using namespace std::chrono_literals;
@@ -134,44 +135,53 @@ void DmxFrame::setLogicValues(const SampleType low, const SampleType high)
 
 void DmxFrame::recalculate()
 {
-    const auto slotDuration = (timing.bit * 11) + timing.markTimeBetweenSlots;
     const auto frameDuration =
         timing.markBeforeBreak
         + timing.spaceForBreak
         + timing.markAfterBreak
-        + (slotDuration * slotValues.size())
-        + timing.markTimeBetweenSlots;
-
+        + ((timing.bit * 11) * slotValues.size())
+        + (timing.markTimeBetweenSlots * (slotValues.size() - 1));
     frame.resize(frameDuration / sampleResolution);
+
+    // Mark before break
     const auto mmbEnd = frame.begin() + (timing.markBeforeBreak / sampleResolution);
+    std::fill(frame.begin(), mmbEnd, logicHigh);
+
+    // Break
     const auto spaceForBreakEnd = mmbEnd + (timing.spaceForBreak / sampleResolution);
+    std::fill(mmbEnd, spaceForBreakEnd, logicLow);
+
+    // Mark after break
     const auto mabEnd = spaceForBreakEnd + (timing.markAfterBreak / sampleResolution);
-    auto iSlot = mabEnd;
+    std::fill(spaceForBreakEnd, mabEnd, logicHigh);
 
-    std::fill(frame.begin(), mmbEnd, logicHigh); // Mark before break
-    std::fill(mmbEnd, spaceForBreakEnd, logicLow); // Break
-    std::fill(spaceForBreakEnd, mabEnd, logicHigh); // Mark after break
-
+    // Slots
+    auto iFrame = mabEnd;
     const auto slotFill = [&](const std::chrono::microseconds duration, const SampleType value)
     {
         if (duration <= 0us)
         {
-            return iSlot;
+            return iFrame;
         }
-        const auto iSlotEnd = iSlot + (duration / sampleResolution);
-        std::fill(iSlot, iSlotEnd, value);
+        const auto iSlotEnd = iFrame + (duration / sampleResolution);
+        std::fill(iFrame, iSlotEnd, value);
         return iSlotEnd;
     };
-    for (const auto slotValue : slotValues)
+    auto iSlotValue = slotValues.cbegin();
+    while(iSlotValue != slotValues.cend())
     {
-        iSlot = slotFill(timing.bit, logicLow); // Start bit
+        iFrame = slotFill(timing.bit, logicLow); // Start bit
         for (uint8_t bit = 0; bit < 8; ++bit) // Slot value
         {
-            const auto fillValue = (slotValue & (1U << bit)) ? logicHigh : logicLow;
-            iSlot = slotFill(timing.bit, fillValue);
+            const auto fillValue = (*iSlotValue & (1U << bit)) ? logicHigh : logicLow;
+            iFrame = slotFill(timing.bit, fillValue);
         }
-        iSlot = slotFill(timing.bit * 2, logicHigh); // Stop bits
-        iSlot = slotFill(timing.markTimeBetweenSlots, logicHigh); // Mark time between slots
+        iFrame = slotFill(timing.bit * 2, logicHigh); // Stop bits
+        if (++iSlotValue != slotValues.cend())
+        {
+            iFrame = slotFill(timing.markTimeBetweenSlots, logicHigh); // Mark time between slots
+        }
     }
+    assert(iFrame == frame.cend());
     emit frameUpdated();
 }
