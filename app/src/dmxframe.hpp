@@ -116,6 +116,7 @@ signals:
     void dataSlotChanged(uint16_t slot);
     void timingChanged();
     void frameUpdated();
+    void sampleCountChanged();
 
 private:
     void recalculate();

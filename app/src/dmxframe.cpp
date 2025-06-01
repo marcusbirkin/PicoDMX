@@ -141,7 +141,12 @@ void DmxFrame::recalculate()
         + timing.markAfterBreak
         + ((timing.bit * 11) * slotValues.size())
         + (timing.markTimeBetweenSlots * (slotValues.size() - 1));
-    frame.resize(frameDuration / sampleResolution);
+    const auto sampleCount = frameDuration / sampleResolution;
+    if (frame.size() != sampleCount)
+    {
+        frame.resize(sampleCount);
+        emit sampleCountChanged();
+    }
 
     // Mark before break
     const auto mmbEnd = frame.begin() + (timing.markBeforeBreak / sampleResolution);

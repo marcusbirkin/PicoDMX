@@ -132,6 +132,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&frame, &DmxFrame::timingChanged, this, [&] { refreshFrameSetupWidgets(); });
     connect(&frame, &DmxFrame::startCodeChanged, this, [&] { refreshFrameSetupWidgets(); });
     connect(&frame, &DmxFrame::dataSlotCountChanged, this, [&] { refreshFrameSetupWidgets(); });
+    connect(&frame, &DmxFrame::sampleCountChanged, this, [&] { refreshFrameSetupWidgets(); });
 
     connect(ui->actionAboutQt, &QAction::triggered, this, [&]{ QMessageBox::aboutQt(this); });
 
