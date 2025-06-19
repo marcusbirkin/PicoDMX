@@ -78,7 +78,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->dataSlotsTable->setModel(new DmxFrameDataSlotsModel(frame));
     ui->dataSlotsTable->setItemDelegate(new DmxFrameDataSlotsDelegate(this));
     ui->dataSlotsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    connect(ui->dataSlotsTable->model(), &QAbstractTableModel::dataChanged, this, &MainWindow::setAwg);
 
     connect(ui->bitTimeEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
     connect(ui->breakTimeEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
