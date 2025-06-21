@@ -264,20 +264,6 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pbSlotPatternFull">
-               <property name="text">
-                <string>All 100%</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="pbSlotPatternIncreasing">
-               <property name="text">
-                <string>0%...100%</string>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="0">
               <widget class="QPushButton" name="pbSlotPatternZero">
                <property name="text">
@@ -285,10 +271,38 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="0" column="2">
+              <widget class="QPushButton" name="pbSlotPatternIncreasing">
+               <property name="text">
+                <string>0%...100%</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="pbSlotPatternFull">
+               <property name="text">
+                <string>All 100%</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
               <widget class="QPushButton" name="pbSlotPatternDecreasing">
                <property name="text">
                 <string>100%...0%</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="pbSlotPatternOdd">
+               <property name="text">
+                <string>Odd 100%</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="pbSlotPatternEven">
+               <property name="text">
+                <string>Even 100%</string>
                </property>
               </widget>
              </item>

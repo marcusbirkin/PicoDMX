@@ -126,6 +126,27 @@ MainWindow::MainWindow(QWidget *parent)
             std::iota(values.rbegin(), values.rend(), 0);
             frame.setDataSlots({values.cbegin(), values.cend()});
         });
+    connect(ui->pbSlotPatternOdd, &QPushButton::clicked,
+        this, [&frame = frame]
+        {
+            std::vector<uint8_t> values(frame.getDataSlotCount(), 0);
+            for (size_t idx = 0; idx < values.size(); idx+=2)
+            {
+                values[idx] = 255;
+            }
+            frame.setDataSlots({values.cbegin(), values.cend()});
+        });
+    connect(ui->pbSlotPatternEven, &QPushButton::clicked,
+        this, [&frame = frame]
+        {
+            std::vector<uint8_t> values(frame.getDataSlotCount(), 0);
+            for (size_t idx = 1; idx < values.size(); idx+=2)
+            {
+                values[idx] = 255;
+            }
+            frame.setDataSlots({values.cbegin(), values.cend()});
+        });
+
 
     connect(&frame, &DmxFrame::frameUpdated, this, [&] { setAwg(); });
     connect(&frame, &DmxFrame::timingChanged, this, [&] { refreshFrameSetupWidgets(); });
