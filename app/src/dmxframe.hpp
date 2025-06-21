@@ -24,6 +24,7 @@ public:
         std::chrono::microseconds spaceForBreak;
         std::chrono::microseconds markAfterBreak;
         std::chrono::microseconds markTimeBetweenSlots{0};
+        uint16_t markTimeBetweenSlotsFrequency{1};
         std::chrono::microseconds markBeforeBreak{0};
     };
 

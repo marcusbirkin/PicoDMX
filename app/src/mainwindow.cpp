@@ -18,13 +18,14 @@ enum DeviceListRoles
     PicoScopeDevice = Qt::UserRole
 };
 
-struct SettingsKey
+namespace SettingsKey
 {
     static constexpr auto geometry = "MainWindow/geometry";
     static constexpr auto bitTimeEdit = "DMXFrame/bitTime";
     static constexpr auto breakTimeEdit = "DMXFrame/breakTime";
     static constexpr auto mabTimeEdit = "DMXFrame/mabTime";
     static constexpr auto mtbsTimeEdit = "DMXFrame/mtbsTime";
+    static constexpr auto mtbsFrequencyEdit = "DMXFrame/mtbsFrequency";
     static constexpr auto mbbTimeEdit = "DMXFrame/mbbTime";
     static constexpr auto dataSlotCountEdit = "DMXFrame/dataSlotCount";
     static constexpr auto startCodeEdit = "DMXFrame/startCode";
@@ -83,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->breakTimeEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
     connect(ui->mabTimeEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
     connect(ui->mtbsTimeEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
+    connect(ui->mtbsFrequencyEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
     connect(ui->mbbTimeEdit, &QSpinBox::valueChanged, this, &MainWindow::updateFrameTiming);
     connect(ui->dataSlotCountEdit, &QSpinBox::valueChanged, this, [&frame = frame](const int value) { frame.setDataSlotCount(value); });
     connect(ui->startCodeEdit, &QSpinBox::valueChanged, this, [&frame = frame](const int value) { frame.setStartCode(value); });
@@ -192,6 +194,7 @@ void MainWindow::saveSettings()
     settings.setValue(SettingsKey::breakTimeEdit, ui->breakTimeEdit->value());
     settings.setValue(SettingsKey::mabTimeEdit, ui->mabTimeEdit->value());
     settings.setValue(SettingsKey::mtbsTimeEdit, ui->mtbsTimeEdit->value());
+    settings.setValue(SettingsKey::mtbsFrequencyEdit, ui->mtbsFrequencyEdit->value());
     settings.setValue(SettingsKey::mbbTimeEdit, ui->mbbTimeEdit->value());
     settings.setValue(SettingsKey::dataSlotCountEdit, ui->dataSlotCountEdit->value());
     settings.setValue(SettingsKey::startCodeEdit, ui->startCodeEdit->value());
@@ -217,6 +220,7 @@ void MainWindow::loadSettings()
     setValue(ui->breakTimeEdit, SettingsKey::breakTimeEdit);
     setValue(ui->mabTimeEdit, SettingsKey::mabTimeEdit);
     setValue(ui->mtbsTimeEdit, SettingsKey::mtbsTimeEdit);
+    setValue(ui->mtbsFrequencyEdit, SettingsKey::mtbsFrequencyEdit);
     setValue(ui->mbbTimeEdit, SettingsKey::mbbTimeEdit);
     setValue(ui->dataSlotCountEdit, SettingsKey::dataSlotCountEdit);
     setValue(ui->startCodeEdit, SettingsKey::startCodeEdit);
@@ -267,6 +271,7 @@ void MainWindow::refreshFrameSetupWidgets()
     setValue(ui->breakTimeEdit, toMicrosecondCount(timing.spaceForBreak));
     setValue(ui->mabTimeEdit, toMicrosecondCount(timing.markAfterBreak));
     setValue(ui->mtbsTimeEdit, toMicrosecondCount(timing.markTimeBetweenSlots));
+    setValue(ui->mtbsFrequencyEdit, timing.markTimeBetweenSlotsFrequency);
     setValue(ui->mbbTimeEdit, toMicrosecondCount(timing.markBeforeBreak));
     setValue(ui->startCodeEdit, frame.getStartCode());
     setValue(ui->dataSlotCountEdit, frame.getDataSlotCount());
@@ -302,6 +307,7 @@ void MainWindow::updateFrameTiming()
         .spaceForBreak = std::chrono::microseconds{ui->breakTimeEdit->value()},
         .markAfterBreak = std::chrono::microseconds{ui->mabTimeEdit->value()},
         .markTimeBetweenSlots = std::chrono::microseconds{ui->mtbsTimeEdit->value()},
+        .markTimeBetweenSlotsFrequency = static_cast<uint16_t>(ui->mtbsFrequencyEdit->value()),
         .markBeforeBreak = std::chrono::microseconds{ui->mbbTimeEdit->value()} });
 
     ui->frameTimeDisplay->setValue(toMicrosecondCount(frame.getDuration()));

@@ -47,6 +47,7 @@ DmxFrame::DmxFrame(const Preset& preset)
 
 void DmxFrame::setTiming(const Timing& value)
 {
+    assert(value.markTimeBetweenSlotsFrequency > 0);
     if (timing != value)
     {
         timing = value;
@@ -140,7 +141,7 @@ void DmxFrame::recalculate()
         + timing.spaceForBreak
         + timing.markAfterBreak
         + ((timing.bit * 11) * slotValues.size())
-        + (timing.markTimeBetweenSlots * (slotValues.size() - 1));
+        + (timing.markTimeBetweenSlots * ((slotValues.size() - 1) / timing.markTimeBetweenSlotsFrequency));
     const auto sampleCount = frameDuration / sampleResolution;
     if (frame.size() != sampleCount)
     {
@@ -172,17 +173,19 @@ void DmxFrame::recalculate()
         std::fill(iFrame, iSlotEnd, value);
         return iSlotEnd;
     };
-    auto iSlotValue = slotValues.cbegin();
-    while(iSlotValue != slotValues.cend())
+
+    for (uint16_t slotIdx = 0; slotIdx < slotValues.size(); ++slotIdx)
     {
         iFrame = slotFill(timing.bit, logicLow); // Start bit
         for (uint8_t bit = 0; bit < 8; ++bit) // Slot value
         {
-            const auto fillValue = (*iSlotValue & (1U << bit)) ? logicHigh : logicLow;
+            const auto fillValue = (slotValues[slotIdx] & (1U << bit)) ? logicHigh : logicLow;
             iFrame = slotFill(timing.bit, fillValue);
         }
         iFrame = slotFill(timing.bit * 2, logicHigh); // Stop bits
-        if (++iSlotValue != slotValues.cend())
+        if ((timing.markTimeBetweenSlots > std::chrono::microseconds{0})
+            && (slotIdx < (slotValues.size() - 1))
+            && (((slotIdx + 1) % timing.markTimeBetweenSlotsFrequency) == 0))
         {
             iFrame = slotFill(timing.markTimeBetweenSlots, logicHigh); // Mark time between slots
         }
